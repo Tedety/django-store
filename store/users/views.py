@@ -34,8 +34,18 @@ def registration(request):
     return render(request, 'users/registrations.html', context)
 
 def profile(request):
-    form = UserProfileForm()
-    context = {'title': 'Store - профиль'}
+    if request.method == 'POST':
+        print("POST data:", request.POST)  # Добавьте для отладки
+        print("FILES:", request.FILES)    # Проверка загрузки файлов
+        form = UserProfileForm(instance=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            print("Форма не валидна. Ошибки:", form.errors)  # Добавьте эту строку
+    else:
+        form = UserProfileForm(instance=request.user)
+    context = {'title': 'Store - профиль', 'form': form}
     return render(request, 'users/profile.html', context)
 
 def logout(request):
